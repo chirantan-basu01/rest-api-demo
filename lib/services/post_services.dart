@@ -1,23 +1,27 @@
 import 'dart:convert';
-import 'dart:developer';
-import '../models/post_model.dart';
+
 import 'package:http/http.dart' as http;
 
-class PostServices {
-  static List<PostList> list = [];
+import '../models/post_model.dart';
 
-  static Future<List<PostList>> getProductData({required int perPage}) async {
+class PostRepository {
+  final String baseUrl = 'https://jsonplaceholder.typicode.com';
+
+  Future<List<Post>> fetchPosts() async {
+    final response = await http.get(Uri.parse('$baseUrl/posts'));
+
     try {
-      http.Response response = await http
-          .get(Uri.parse("https://jsonplaceholder.typicode.com/posts"));
       if (response.statusCode == 200) {
-        var data = jsonDecode(response.body) as List;
-        list = data.map((e) => PostList.fromJson(e)).toList();
-        perPage = perPage + 1;
+        // List<Post> posts = Post.fromJsonList(response.body);
+        List<dynamic> jsonResponse = json.decode(response.body);
+        List<Post> posts =
+            jsonResponse.map((post) => Post.fromJson(post)).toList();
+        return posts;
+      } else {
+        throw Exception('Failed to load posts');
       }
     } catch (e) {
-      log("message", error: e.toString());
+      rethrow;
     }
-    return list;
   }
 }

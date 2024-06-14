@@ -1,57 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:rest_api_demo/models/post_model.dart';
-import 'package:rest_api_demo/services/post_services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+import '../bloc/post_bloc.dart';
+import '../bloc/post_event.dart';
+import '../bloc/post_state.dart';
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final ScrollController _scrollController = ScrollController();
-  int perPage = 0;
-  int limit = 10;
+class PostListPage extends StatelessWidget {
+  const PostListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
       appBar: AppBar(
+        title: const Text('Posts using Bloc'),
         centerTitle: true,
-        title: const Text("Rest Api Demo"),
-        backgroundColor: Colors.grey[200],
       ),
-      body: FutureBuilder(
-        future: PostServices.getProductData(perPage: perPage),
-        builder: (context, AsyncSnapshot<List<PostList>> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-            case ConnectionState.waiting:
-              return const Center(child: CircularProgressIndicator());
-            case ConnectionState.active:
-            case ConnectionState.done:
-              return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  controller: _scrollController,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      leading: Text(
-                        snapshot.data?[index].id,
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                      title: Text(snapshot.data?[index].title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 20,
-                          )),
-                      subtitle: Text(snapshot.data?[index].body),
-                    );
-                  });
+      body: BlocBuilder<PostBloc, PostState>(
+        builder: (context, state) {
+          if (state is PostLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is PostLoaded) {
+            return ListView.builder(
+              itemCount: state.posts.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: Text(state.posts[index].id.toString()),
+                  title: Text(state.posts[index].title ?? ''),
+                  subtitle: Text(state.posts[index].body ?? ''),
+                );
+              },
+            );
+          } else if (state is PostError) {
+            return Center(child: Text(state.message));
+          } else {
+            return const Center(child: Text('Press the button to fetch posts'));
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.read<PostBloc>().add(FetchPosts()),
+        child: const Icon(Icons.refresh),
       ),
     );
   }

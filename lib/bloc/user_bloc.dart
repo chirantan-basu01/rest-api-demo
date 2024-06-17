@@ -5,7 +5,7 @@ import 'package:rest_api_demo/bloc/user_state.dart';
 import '../services/api_services.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
-  final PostRepository repository;
+  final Repository repository;
 
   UserBloc(this.repository) : super(UserInitial()) {
     on<FetchUsers>((event, emit) async {

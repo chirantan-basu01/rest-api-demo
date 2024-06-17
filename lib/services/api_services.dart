@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import '../models/post_model.dart';
 import '../models/user_model.dart';
 
-class PostRepository {
+class Repository {
   final String baseUrl = 'https://jsonplaceholder.typicode.com';
 
   Future<List<Post>> fetchPosts() async {
@@ -13,7 +13,6 @@ class PostRepository {
 
     try {
       if (response.statusCode == 200) {
-        // List<Post> posts = Post.fromJsonList(response.body);
         List<dynamic> jsonResponse = json.decode(response.body);
         return jsonResponse.map((post) => Post.fromJson(post)).toList();
       } else {

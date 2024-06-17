@@ -4,7 +4,7 @@ import 'post_event.dart';
 import 'post_state.dart';
 
 class PostBloc extends Bloc<PostEvent, PostState> {
-  final PostRepository repository;
+  final Repository repository;
 
   PostBloc(this.repository) : super(PostInitial()) {
     on<FetchPosts>((event, emit) async {

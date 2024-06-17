@@ -7,7 +7,7 @@ import 'bloc/post_bloc.dart';
 import 'pages/home_page.dart';
 
 void main() {
-  final PostRepository repository = PostRepository();
+  final Repository repository = Repository();
 
   runApp(
     MultiBlocProvider(
